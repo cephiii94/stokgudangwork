@@ -1,154 +1,132 @@
-// Konfigurasi Aplikasi
-const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ZgVsEy-2l4aREU5C4rnn2X7FptYZj0KtgswA8ojL-40/edit?usp=sharing'; // GANTI DENGAN LINK ANDA
-// [DITAMBAHKAN] Nama sheet 'Pengumuman'
-const SHEET_NAMES = ['Gudang', 'Ali Akbar', 'Yanuar Efendi', 'Yusril', 'totalstok', 'Pengumuman']; 
+// ============================================================
+// DATA LOADER BARU (FIREBASE MODE)
+// ============================================================
 
-// Fungsi untuk mengubah link Google Sheet menjadi link unduhan CSV
-function getSheetCsvUrl(baseUrl, sheetName) {
-    const sheetId = baseUrl.split('/d/')[1].split('/')[0];
-    return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
-}
+// URL Endpoint Firebase (Akses langsung ke JSON)
+// Bri ambil dari screenshot database Tuan tadi
+const FIREBASE_ENDPOINT = "https://project-notonlen-default-rtdb.asia-southeast1.firebasedatabase.app/stok_ppu.json";
 
-// Fungsi untuk mengubah teks CSV menjadi array objek JSON
-function csvToJson(csv) {
-    const lines = csv.trim().split('\n');
-    if (lines.length < 2) return [];
-    const headers = lines.shift().split(',').map(header => header.replace(/^"|"$/g, '').trim());
-    const jsonResult = [];
-
-    lines.forEach(line => {
-        const obj = {};
-        const values = [];
-        let current = '';
-        let inQuotes = false;
-        for (let char of line) {
-            if (char === '"' && inQuotes && current.slice(-1) === '"') {
-                current += char;
-            } else if (char === '"' && inQuotes) {
-                inQuotes = false;
-            } else if (char === '"' && !inQuotes) {
-                inQuotes = true;
-            } else if (char === ',' && !inQuotes) {
-                values.push(current.replace(/^"|"$/g, '').trim());
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-        values.push(current.replace(/^"|"$/g, '').trim());
-
-        if (values.length === headers.length) {
-            headers.forEach((header, i) => {
-                obj[header] = values[i];
-            });
-            jsonResult.push(obj);
-        }
-    });
-
-    return jsonResult;
-}
-
-// Fungsi utama untuk mengambil dan memproses semua data
+// Fungsi utama untuk mengambil data
 async function fetchAndProcessData() {
-    console.log("Mulai mengambil data...");
-    const allItems = [];
-    let gudangSummaryData = [];
+    console.log("🚀 Mengambil data dari Firebase...");
     
-    // [BARU] Variabel global untuk data pengumuman
-    window.pengumumanData = [];
-    
+    // Reset data global
+    window.gudangSummary = [];
+    window.processedData = [];
+    window.pengumumanData = []; // Nanti bisa kita tambah fitur pengumuman di Firebase
     window.updateTimestamps = {
         gudang: null,
         canvassers: {}
     };
 
-    for (const sheetName of SHEET_NAMES) {
-        const url = getSheetCsvUrl(GOOGLE_SHEET_URL, sheetName);
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                console.error(`Gagal mengambil data untuk sheet: ${sheetName}`);
-                continue;
-            }
-            const csvText = await response.text();
-            const jsonData = csvToJson(csvText);
+    try {
+        // 1. Fetch Data dari Firebase (Super Cepat!)
+        const response = await fetch(FIREBASE_ENDPOINT);
+        if (!response.ok) throw new Error("Gagal menghubungi Firebase");
+        
+        const dbData = await response.json();
 
-            if (sheetName === 'totalstok') {
-                gudangSummaryData = jsonData;
-                if (jsonData.length > 0 && jsonData[0].LastUpdate) {
-                    window.updateTimestamps.gudang = jsonData[0].LastUpdate;
-                }
-            } else if (sheetName === 'Pengumuman') {
-                // [BARU] Menyimpan data dari sheet Pengumuman
-                window.pengumumanData = jsonData;
-            } else {
-                if (sheetName !== 'Gudang' && jsonData.length > 0 && jsonData[0].LastUpdate) {
-                    window.updateTimestamps.canvassers[sheetName] = jsonData[0].LastUpdate;
-                }
+        if (!dbData) {
+            console.warn("Database kosong!");
+            return;
+        }
 
-                jsonData.forEach(item => {
-                    if (sheetName === 'Gudang') {
-                        item.Lokasi = 'Gudang';
-                        item.Canvasser = null;
-                        item.Status = 'Alokasi';
-                    } else {
-                        item.Lokasi = 'Canvasser';
-                        item.Canvasser = sheetName;
-                    }
-                    allItems.push(item);
+        // 2. Ambil Waktu Update Terakhir
+        const lastUpdate = dbData.LastUpdate || "Belum ada update";
+        window.updateTimestamps.gudang = lastUpdate; // Kita pakai satu waktu untuk semua sementara ini
+
+        // 3. Proses Data Gudang
+        if (dbData.Gudang) {
+            window.gudangSummary = dbData.Gudang.map(item => ({
+                nama: (item.nama || '').trim(),
+                provider: (item.provider || '').toLowerCase().trim(),
+                jenis: (item.jenis || '').toLowerCase().trim().replace(/ /g, '-'),
+                tipe: (item.tipe || '').toLowerCase().trim(),
+                stok: parseInt(item.stok, 10) || 0
+            }));
+        }
+
+        // 4. Proses Data Canvasser
+        // Kita harus ubah format Firebase biar cocok sama logika Dashboard Tuan yang lama
+        const processedItems = [];
+
+        if (dbData.Canvasser) {
+            // Loop setiap nama canvasser (Ali, Yanuar, dll)
+            Object.keys(dbData.Canvasser).forEach(canvasserName => {
+                const items = dbData.Canvasser[canvasserName];
+                
+                // Set timestamp per canvasser (samakan dulu dengan global)
+                window.updateTimestamps.canvassers[canvasserName] = lastUpdate;
+
+                // Loop barang bawaan mereka
+                items.forEach(item => {
+                    // Masukkan ke array utama
+                    processedItems.push({
+                        nama: item.nama,
+                        provider: (item.provider || '').toLowerCase(),
+                        jenis: (item.jenis || '').toLowerCase().replace(/ /g, '-'),
+                        tipe: (item.tipe || '').toLowerCase(),
+                        lokasi: 'Canvasser',
+                        canvasser: canvasserName,
+                        
+                        // Detail spesifik untuk Modal & Tabel Detail
+                        id: item.sn,      // Serial Number
+                        status: item.status, // Alokasi / Sell In
+                        alokasiAwal: item.alokasi
+                    });
                 });
+            });
+        }
+
+        // 5. Kelompokkan Data Canvasser (Grouping Logic)
+        // Dashboard Tuan butuh data yang sudah dikelompokkan per Produk + Canvasser
+        const groupedData = processedItems.reduce((acc, item) => {
+            const key = `${item.nama}-${item.canvasser}`;
+            
+            if (!acc[key]) {
+                acc[key] = {
+                    nama: item.nama,
+                    provider: item.provider,
+                    jenis: item.jenis,
+                    tipe: item.tipe,
+                    lokasi: 'Canvasser',
+                    canvasser: item.canvasser,
+                    items: [] // Array untuk menampung list SN
+                };
             }
-        } catch (error) {
-            console.error(`Error saat memproses sheet ${sheetName}:`, error);
-        }
-    }
+            
+            // Masukkan detail SN ke dalam kelompok ini
+            acc[key].items.push({
+                id: item.id,
+                status: item.status
+            });
+            
+            return acc;
+        }, {});
 
-    // Proses data ringkasan gudang
-    window.gudangSummary = gudangSummaryData.map(item => ({
-        nama: (item.NamaProduk || '').trim(),
-        provider: (item.Provider || '').toLowerCase().trim(),
-        jenis: (item.Jenis || '').toLowerCase().trim().replace(/ /g, '-'),
-        tipe: (item.Tipe || '').toLowerCase().trim(),
-        stok: parseInt(item.Total, 10) || 0
-    }));
+        // Simpan hasil grouping ke variabel global window.processedData
+        window.processedData = Object.values(groupedData);
 
-    // Mengelompokkan item berdasarkan produk
-    const groupedData = allItems.reduce((acc, item) => {
-        const trimmedNamaProduk = (item.NamaProduk || '').trim();
-        if (!trimmedNamaProduk) return acc;
-
-        const key = `${trimmedNamaProduk}-${item.Canvasser || 'Gudang'}`;
-        if (!acc[key]) {
-            acc[key] = {
-                nama: trimmedNamaProduk,
-                provider: (item.Provider || '').toLowerCase().trim(),
-                jenis: (item.Jenis || '').toLowerCase().trim().replace(/ /g, '-'),
-                tipe: (item.Tipe || '').toLowerCase().trim(),
-                lokasi: item.Lokasi,
-                canvasser: item.Canvasser,
-                items: []
-            };
-        }
-        acc[key].items.push({
-            id: item.SerialNumber,
-            status: item.Status
+        console.log("✅ Data berhasil diproses!", {
+            gudang: window.gudangSummary.length,
+            canvasserGroups: window.processedData.length
         });
-        return acc;
-    }, {});
-    
-    console.log("Data berhasil diambil dan diproses.");
-    window.processedData = Object.values(groupedData);
-    return { gudangSummary: window.gudangSummary, processedData: window.processedData };
+
+    } catch (error) {
+        console.error("❌ Error fetch data:", error);
+        document.body.innerHTML = `<div style="text-align: center; padding: 50px; color: red;">
+            <h1>Koneksi Gagal</h1>
+            <p>${error.message}</p>
+        </div>`;
+    }
 }
 
-// Menjalankan pengambilan data saat script dimuat
+// Menjalankan saat script dimuat
 document.addEventListener('DOMContentLoaded', () => {
     const dataReadyEvent = new Event('dataReady');
     
     fetchAndProcessData().then(() => {
+        // Beritahu script.js dan dashboard.js kalau data sudah siap
         document.dispatchEvent(dataReadyEvent);
-    }).catch(error => {
-        console.error("Gagal memuat data aplikasi:", error);
-        document.body.innerHTML = `<div style="text-align: center; padding: 50px;"><h1>Gagal memuat data</h1><p>Pastikan link Google Sheet benar dan sudah dibagikan.</p></div>`;
     });
 });
