@@ -3,144 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Stok Gudang</title>
-    <link rel="icon" href="image/icon.png" type="image/x-icon">
-
-    <!-- Google Fonts: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Link ke CSS -->
-    <link rel="stylesheet" href="global-styles.css">
-    <link rel="stylesheet" href="dashboard-styles.css">
-    <!-- [DITAMBAHKAN] Style untuk kartu yang bisa di-klik -->
-    <style>
-        .summary-card.clickable {
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .summary-card.clickable:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        }
-    </style>
+    <title>Dashboard Stok Gudang V2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style-v2.css">
 </head>
 <body>
-    <!-- Mobile Top Navbar (shown only on mobile) -->
+
     <nav class="mobile-navbar">
         <div class="mobile-navbar-content">
             <div class="mobile-logo">STOK GUDANG | PPU</div>
-            <div class="mobile-user">
-                <i class="fas fa-user-circle"></i>
-                <span>Cecep</span>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                 <div class="theme-toggle-btn" id="darkModeToggleMobile" style="width: 30px; height: 30px;">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="mobile-user">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Cecep</span>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container">
-        <!-- =============== Sidebar =============== -->
+    <div class="app-container">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h3>STOK GUDANG | PPU</h3>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li>
-                        <a href="index.html" class="active">
-                            <i class="fas fa-home"></i>
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="dashboard.html">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-signal"></i>
-                            <span>Status</span>
-                        </a>
-                    </li>
+                    <li><a href="index.html" class="active"><i class="fas fa-home"></i> <span>Home</span></a></li>
+                    <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#"><i class="fas fa-signal"></i> <span>Status</span></a></li>
                 </ul>
             </nav>
-            <!-- <div class="sidebar-footer">
+            <div class="sidebar-footer">
                 <div class="profile">
-                    <div class="profile-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
                     <div class="profile-info">
                         <h4>Cecep Hardiansyah</h4>
                         <small>Admin</small>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </aside>
 
-        <!-- =============== Main Content =============== -->
         <main class="main-content">
-            <!-- Header -->
             <header class="main-header">
+                <h2 class="page-title">Ringkasan Stok</h2>
                 <div class="header-icons">
+                    <button id="darkModeToggle" class="theme-toggle-btn"><i class="fas fa-moon"></i></button>
                     <div class="notification-wrapper">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-dot" style="display: none;"></span>
+                        <span class="notification-dot"></span>
                         <div class="notification-dropdown">
                             <div class="notification-header">Notifikasi</div>
-                            <ul id="notification-list">
-                                <!-- Konten notifikasi akan diisi oleh JavaScript -->
-                            </ul>
+                            <ul id="notification-list"></ul>
                         </div>
                     </div>
-                    <!-- [DIUBAH] Menambahkan ID untuk event listener -->
                     <i class="fas fa-info-circle" id="info-icon"></i>
                     <i class="fas fa-cog"></i>
                 </div>
             </header>
 
-            <!-- Content -->
-            <div class="content-body">
-                <!-- Stok Gudang Section -->
-                <section class="stock-section">
-                    <div class="section-header">
-                        <h2>Stok Gudang</h2>
-                        <small class="update-timestamp" id="gudang-update-time"></small>
-                        <a href="dashboard.html" class="see-all" id="see-all-gudang">See All</a>
+            <section class="stock-section">
+                <div class="section-header-row" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+                    <h3>Stok Gudang</h3>
+                    <small id="gudang-update-time" style="color:var(--color-text-muted);">Loading...</small>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-row">
+                        <span class="filter-item active" data-filter-group="jenis" data-filter-value="kartu-perdana">KARTU PERDANA</span>
+                        <span class="filter-item" data-filter-group="jenis" data-filter-value="voucher">VOUCHER</span>
                     </div>
-                    <!-- Filter Group -->
-                    <div class="filter-group">
-                        <div class="filter-row">
-                            <!-- [DIUBAH] Filter Dompul dihapus -->
-                            <span class="filter-item active" data-filter-group="jenis" data-filter-value="kartu-perdana">KARTU PERDANA</span> |
-                            <span class="filter-item" data-filter-group="jenis" data-filter-value="voucher">VOUCHER</span>
-                        </div>
-                        <div class="filter-row">
-                            <span class="filter-item active" data-filter-group="tipe" data-filter-value="kosongan">KOSONGAN</span> |
-                            <span class="filter-item" data-filter-group="tipe" data-filter-value="paket">PAKET</span>
-                        </div>
+                    <div class="filter-row">
+                        <span class="filter-item active" data-filter-group="tipe" data-filter-value="kosongan">KOSONGAN</span>
+                        <span class="filter-item" data-filter-group="tipe" data-filter-value="paket">PAKET</span>
                     </div>
-                    <div class="summary-cards" id="gudang-summary">
-                        <!-- Cards will be populated by JavaScript -->
-                    </div>
-                </section>
+                </div>
+                <div class="summary-cards" id="gudang-summary"></div>
+            </section>
 
-                <!-- Stok Canvasser Section -->
-                <section class="stock-section">
-                    <div class="section-header">
-                        <h2>Stok Canvasser</h2>
-                    </div>
-                    <div class="canvasser-grid" id="canvasser-grid">
-                        <!-- Canvasser cards will be populated by JavaScript -->
-                    </div>
-                </section>
-            </div>
+            <section class="stock-section" style="margin-top: 3rem;">
+                <h3>Stok Canvasser</h3>
+                <div class="canvasser-grid" id="canvasser-grid"></div>
+            </section>
         </main>
     </div>
 
-    <!-- Bottom Navigation (shown only on mobile) -->
     <nav class="bottom-nav">
         <div class="bottom-nav-content">
             <a href="index.html" class="bottom-nav-item active">
@@ -157,94 +105,79 @@
             </a>
         </div>
     </nav>
-
-    <!-- =============== Modal Rincian Stok =============== -->
+    
     <div id="detailModal" class="modal">
-        <div class="modal-content modal-lg">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalTitle">Rincian Stok</h3>
                 <span class="close-btn" id="closeDetailBtn">&times;</span>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Detail content will be populated by JavaScript -->
-            </div>
-            <div class="modal-footer" id="modalFooter">
-                 <!-- Footer content will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- =============== Modal untuk QR Code & Serial Number =============== -->
-    <div id="qrCodeModal" class="modal">
-        <div class="modal-content modal-lg">
-            <div class="modal-header">
-                <h3 id="qrCodeModalTitle">Rincian Produk</h3>
-                <span class="close-btn" id="closeQrCodeBtn">&times;</span>
-            </div>
-            <div class="modal-body" id="qrCodeModalBody">
-                <div class="qrcode-info-container">
-                    <div class="qrcode-display">
-                        <h4>QR Code</h4>
-                        <div id="qrcode"></div>
-                        <p id="qrcodeValue"></p>
-                    </div>
-                    <div class="serial-number-list">
-                        <h4 id="serialNumberHeader">MSISDN / Serial Number</h4>
-                        <div class="table-wrapper-modal">
-                            <table id="serialNumberTable">
-                                <tbody id="serialNumberTableBody">
-                                    <!-- Data akan di-generate oleh JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
         </div>
     </div>
     
-    <!-- =============== [BARU] Modal Informasi Aplikasi =============== -->
-<div id="infoModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="infoModalTitle">Pusat Informasi</h3>
-            <span class="close-btn" id="closeInfoBtn">&times;</span>
-        </div>
-        <div class="modal-tabs">
-            <button class="tab-btn active" data-tab="pengumumanContent">Pengumuman</button>
-            <button class="tab-btn" data-tab="informasiContent">Informasi Aplikasi</button>
-        </div>
-        <div class="modal-body info-modal-body">
-            <div id="pengumumanContent" class="tab-content">
-                </div>
-            <div id="informasiContent" class="tab-content hidden">
-                <div class="info-section">
-                    <h4>Tentang Aplikasi</h4>
-                    <p>Aplikasi ini dirancang untuk memantau dan mengelola stok gudang serta stok yang didistribusikan ke canvasser secara real-time. Data diambil langsung dari Google Sheets untuk kemudahan pembaruan.</p>
-                </div>
-                <div class="info-section">
-                    <h4>Versi</h4>
-                    <p>Versi 1.2.0</p>
-                </div>
-                <div class="info-section">
-                    <h4>Bantuan & Laporan</h4>
-                    <p>Jika Anda menemukan masalah, data tidak sesuai, atau memiliki saran, jangan ragu untuk menghubungi:</p>
-                    <div class="contact-info">
-                        <a href="mailto:cecephard12@gmail.com" class="contact-link"><i class="fas fa-envelope"></i> Email Pengembang</a>
-                        <a href="https://wa.me/6287777540577" target="_blank" class="contact-link"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Pusat Informasi</h3>
+                <span class="close-btn" id="closeInfoBtn">&times;</span>
+            </div>
+
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-tab="pengumumanContent">Pengumuman</button>
+                <button class="tab-btn" data-tab="informasiContent">Informasi Aplikasi</button>
+            </div>
+
+            <div class="modal-body info-modal-body">
+                
+                <div id="pengumumanContent" class="tab-content">
+                    </div>
+
+                <div id="informasiContent" class="tab-content hidden">
+                    <div class="info-section">
+                        <h4>Tentang Aplikasi</h4>
+                        <p>Aplikasi ini dirancang untuk memantau dan mengelola stok gudang serta stok yang didistribusikan ke canvasser secara real-time. Data diambil langsung dari Database Pusat.</p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Versi</h4>
+                        <p>Versi 2.0.0 (V2 Update)</p>
+                    </div>
+
+                    <div class="info-section">
+                        <h4>Bantuan & Laporan</h4>
+                        <p>Jika Anda menemukan masalah, data tidak sesuai, atau memiliki saran, jangan ragu untuk menghubungi:</p>
+                        <div class="contact-info">
+                            <a href="mailto:cecephard12@gmail.com" class="contact-link">
+                                <i class="fas fa-envelope"></i> Email Pengembang
+                            </a>
+                            <a href="https://wa.me/6287777540577" target="_blank" class="contact-link">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="info-footer">
+                        Dibuat dengan ❤️ untuk PPU
                     </div>
                 </div>
-                <div class="info-footer">
-                    Dibuat dengan ❤️ untuk PPU
-                </div>
+
             </div>
         </div>
     </div>
-</div>
 
-    <!-- Library untuk generate QR Code -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="data-loader.js"></script>
     <script src="script.js"></script>
+    <script src="theme-script.js"></script>
+    <script>
+        const mobileToggle = document.getElementById('darkModeToggleMobile');
+        if(mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                const mainToggle = document.getElementById('darkModeToggle');
+                if(mainToggle) mainToggle.click();
+            });
+        }
+    </script>
 </body>
 </html>
