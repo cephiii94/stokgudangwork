@@ -167,9 +167,41 @@
         </div>
     </div>
 
+    <div id="qrCodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="qrCodeModalTitle">Rincian Produk</h3>
+                <span class="close-btn" id="closeQrCodeBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="qrcode-info-container">
+                    <div class="qrcode-display">
+                        <h4>QR Code</h4>
+                        <div id="qrcode"></div>
+                        <p id="qrcodeValue">No Data</p>
+                    </div>
+                    <div class="serial-number-list">
+                        <h4 id="serialNumberHeader">MSISDN / Serial Number</h4>
+                        <div class="table-wrapper-modal">
+                            <table id="serialNumberTable">
+                                <tbody id="serialNumberTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <script src="data-loader.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
     <script src="script.js"></script>
     <script src="theme-script.js"></script>
+
     <script>
         const mobileToggle = document.getElementById('darkModeToggleMobile');
         if(mobileToggle) {
