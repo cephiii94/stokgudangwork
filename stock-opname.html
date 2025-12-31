@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Stock Opname (SO)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style-v2.css">
+    
+    <link rel="stylesheet" href="so.css">
+</head>
+<body>
+
+    <div id="loader-overlay"><div class="loader"></div></div>
+
+    <nav class="mobile-navbar">
+        <div class="mobile-navbar-content">
+            <div class="mobile-logo">REKAP SO</div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="theme-toggle-btn" id="darkModeToggleMobile" style="width: 30px; height: 30px;">
+                    <i class="fas fa-moon"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h3>STOK GUDANG | PPU</h3></div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-home"></i> <span>Home</span></a></li>
+                    <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i> <span>Dashboard</span></a></li>
+                    <li><a href="stock-opname.html" class="active" style="background: var(--color-primary); color: white;"><i class="fas fa-clipboard-list"></i> <span>Rekap SO</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h2 class="page-title">Rekap Stock Opname</h2>
+                <div class="header-icons">
+                    <button id="darkModeToggle" class="theme-toggle-btn"><i class="fas fa-moon"></i></button>
+                    <i class="fas fa-bell"></i>
+                </div>
+            </header>
+
+            <section class="filter-section">
+                <div class="filter-group">
+                    <label>Filter Tanggal</label>
+                    <input type="date" id="filterDate" class="custom-date">
+                </div>
+                <div class="filter-group">
+                    <label>Filter Lokasi</label>
+                    <select id="filterLocation" class="custom-select">
+                        <option value="All">Semua Lokasi</option>
+                        <option value="Gudang">GUDANG UTAMA</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 0 0 auto;">
+                    <button class="action-btn" id="applyFilterBtn" style="height: 42px; margin-top: auto;">
+                        <i class="fas fa-filter"></i> Terapkan
+                    </button>
+                </div>
+            </section>
+
+            <section class="detail-section">
+                <div class="section-header-row">
+                    <h3>Riwayat Stock Opname</h3>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Lokasi</th>
+                                <th>Item SO</th>
+                                <th>Total Sistem</th>
+                                <th>Total Fisik</th>
+                                <th>Selisih</th>
+                                <th>Keterangan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            </tbody>
+                    </table>
+                    <div id="emptyHistoryMsg" style="text-align: center; padding: 2rem; color: var(--color-text-secondary); display: none;">
+                        Belum ada data SO untuk filter ini.
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button class="fab-add" id="openSoModalBtn" title="Buat SO Baru">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <div id="soModal" class="modal">
+        <div class="modal-content modal-so-content">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <h3>Lembar SO</h3>
+                    <input type="date" id="modalSoDate" class="custom-date" style="padding: 0.3rem; font-size: 0.9rem;">
+                    
+                    <select id="modalSoLocation" class="custom-select" style="padding: 0.3rem;">
+                        <option value="Gudang">GUDANG UTAMA</option>
+                    </select>
+                </div>
+                <span class="close-btn" id="closeSoModalBtn">&times;</span>
+            </div>
+            
+            <div class="modal-body modal-body-so">
+                <div class="search-wrapper-detail" style="margin-bottom: 1rem; width: 100%; max-width: 100%;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="soInputSearch" placeholder="Cari barang untuk di-opname...">
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="detail-modal-table" id="soInputTable">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 200px;">Produk (Dropdown)</th> <th style="width: 70px;">Sistem</th>
+                                <th style="width: 90px;">Fisik</th>
+                                <th style="width: 70px;">Selisih</th>
+                                <th>Keterangan</th>
+                                <th style="width: 40px;"></th> </tr>
+                        </thead>
+                        <tbody id="soInputTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <button id="addSoItemBtn" class="action-btn" style="margin-top: 1rem; width: 100%; border-style: dashed;">
+                    <i class="fas fa-plus"></i> Tambah Item Baris Baru
+                </button>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 1rem;">
+                <button class="action-btn" style="border: 1px solid var(--color-border); color: var(--color-text-secondary);" id="cancelSoBtn">Batal</button>
+                <button class="expand-btn" style="width: auto; padding: 0.8rem 2rem;" id="saveSoBtn">
+                    <i class="fas fa-save"></i> Simpan Laporan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="soDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Rincian Laporan SO</h3>
+                <span class="close-btn" id="closeDetailModalBtn">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: var(--color-background); padding: 1rem; border-radius: 8px;">
+                    <div>
+                        <small style="color: var(--color-text-secondary);">Tanggal</small>
+                        <h4 id="detailDate" style="color: var(--color-text-primary);"></h4>
+                    </div>
+                    <div>
+                        <small style="color: var(--color-text-secondary);">Lokasi</small>
+                        <h4 id="detailLocation" style="color: var(--color-text-primary);"></h4>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 0.5rem; color: var(--color-text-primary);">Item Selisih / Catatan</h4>
+                <div class="table-wrapper">
+                    <table class="detail-modal-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Sistem</th>
+                                <th>Fisik</th>
+                                <th>Selisih</th>
+                                <th>Ket</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-delete" id="btnDeleteSO">
+                        <i class="fas fa-trash"></i> Hapus Laporan
+                    </button>
+                    <button class="action-btn" id="btnEditSO">
+                        <i class="fas fa-edit"></i> Edit Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="customAlertModal" class="modal" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding-bottom: 2rem;">
+            <div class="alert-icon-wrapper">
+                <i id="alertIcon" class="fas fa-info-circle"></i>
+            </div>
+            
+            <h3 id="alertTitle" style="margin-bottom: 0.5rem;">Notifikasi</h3>
+            <p id="alertMessage" style="color: var(--color-text-secondary); margin-bottom: 2rem;">Pesan disini...</p>
+            
+            <div class="alert-actions" style="display: flex; justify-content: center; gap: 1rem;">
+                <button id="btnAlertCancel" class="action-btn" style="border: 1px solid var(--color-border); color: var(--color-text-secondary); display: none;">Batal</button>
+                <button id="btnAlertOk" class="expand-btn" style="width: auto; padding: 0.6rem 2rem;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="bottom-nav-content">
+            <a href="index.html" class="bottom-nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="dashboard.html" class="bottom-nav-item"><i class="fas fa-chart-pie"></i><span>Dash</span></a>
+            <a href="stock-opname.html" class="bottom-nav-item active"><i class="fas fa-clipboard-list"></i><span>SO</span></a>
+        </div>
+    </nav>
+
+    <script src="data-loader.js"></script>
+    <script src="theme-script.js"></script>
+    <script src="so.js"></script>
+</body>
+</html>
