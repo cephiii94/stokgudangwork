@@ -1,515 +1,289 @@
-/* Import Google Fonts */
+/* Import Google Fonts (Opsional jika sudah ada di style-v2.css, tapi aman dibiarkan) */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-/* CSS Variables */
-:root {
-    --color-primary: #4a90e2; /* Soft Blue */
-    --color-secondary: #8ec5fc;
-    --color-background: #f0f7ff; /* Lighter soft blue */
-    --color-surface: rgba(255, 255, 255, 0.7);
-    --color-text-primary: #1e3a8a;
-    --color-text-secondary: #6b7280;
-    --color-text-dark: #333;
-    --border-radius: 12px;
-    --card-padding: 1.5rem;
-    --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
+/* CSS Variables (WARISAN STYLE-V2.CSS) 
+   [Bri Note]: Bri hapus deklarasi ulang :root di sini agar Tuan cukup atur warna di satu tempat saja (style-v2.css).
+   Ini praktik Clean Code agar tidak bingung kalau mau ganti tema.
+*/
 
 /* Reset and Base Styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    text-decoration: none;
-    list-style: none;
+    margin: 0; padding: 0; box-sizing: border-box;
+    text-decoration: none; list-style: none;
 }
 
 body {
     font-family: 'Poppins', sans-serif;
+    /* Menggunakan variabel dari style-v2.css */
     background-color: var(--color-background);
     color: var(--color-text-primary);
     line-height: 1.6;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Penjaga responsif */
 }
 
-/* =============== General Component: Modal =============== */
+/* =============== General Component: Modal (UPDATED) =============== */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    display: none; position: fixed; z-index: 1000;
+    left: 0; top: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s ease;
+    backdrop-filter: blur(4px); /* Efek blur modern */
+    padding: 1rem; /* [Bri Update] Padding mobile */
 }
 
-.modal.show {
-    display: flex;
-    opacity: 1;
-}
+.modal.show { display: flex; opacity: 1; }
 
 .modal-content {
-    background: white;
+    background: var(--color-surface);
     border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 600px;
+    width: 100%; max-width: 600px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-}
-.modal-content.modal-lg {
-    max-width: 800px;
+    transform: scale(0.95); transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
+    max-height: 90vh; /* Batas tinggi agar tidak jebol */
 }
 
-.modal.show .modal-content {
-    transform: scale(1);
-}
+.modal-content.modal-lg { max-width: 800px; }
+
+.modal.show .modal-content { transform: scale(1); }
 
 .modal-header {
-    padding: 1.5rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    gap: 1rem;
+    padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--color-border); gap: 1rem;
+    background-color: var(--color-background); /* Header modal sedikit beda */
 }
 
-.modal-header h3 {
-    color: var(--color-text-dark);
-    margin: 0;
-}
+.modal-header h3 { color: var(--color-text-primary); margin: 0; font-size: 1.1rem; }
 
-.modal-body {
-    padding: 2rem;
-    overflow-y: auto;
-}
+.modal-body { padding: 1.5rem; overflow-y: auto; }
 
-.modal-footer {
-    padding: 1.5rem 2rem;
-    border-top: 1px solid #eee;
-}
+.modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--color-border); background: var(--color-surface); }
 
 .close-btn {
-    font-size: 2rem;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    line-height: 1;
+    font-size: 1.8rem; color: var(--color-text-secondary); cursor: pointer;
+    line-height: 1; padding: 0.5rem; /* Touch target */
+    transition: color 0.3s;
 }
+.close-btn:hover { color: #ef4444; }
 
 /* =============== [BARU] Gaya untuk Info Modal =============== */
-.info-modal-body {
-    padding-top: 1rem;
-    padding-bottom: 1.5rem;
-}
-.info-section {
-    margin-bottom: 1.5rem;
-}
+.info-modal-body { padding-top: 1rem; padding-bottom: 1.5rem; }
+.info-section { margin-bottom: 1.5rem; }
 .info-section h4 {
-    font-weight: 600;
-    color: var(--color-text-dark);
-    margin-bottom: 0.5rem;
-    border-left: 3px solid var(--color-primary);
-    padding-left: 0.75rem;
+    font-weight: 600; color: var(--color-text-primary); margin-bottom: 0.5rem;
+    border-left: 3px solid var(--color-primary); padding-left: 0.75rem;
 }
 .info-section p {
-    font-size: 0.95rem;
-    color: var(--color-text-secondary);
-    padding-left: calc(0.75rem + 3px);
+    font-size: 0.95rem; color: var(--color-text-secondary); padding-left: calc(0.75rem + 3px);
 }
+
 .contact-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    padding-left: calc(0.75rem + 3px);
+    display: flex; flex-direction: column; gap: 0.75rem;
+    margin-top: 1rem; padding-left: calc(0.75rem + 3px);
 }
 .contact-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--color-primary);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.3s ease;
+    display: inline-flex; align-items: center; gap: 0.75rem;
+    color: var(--color-primary); font-weight: 500;
+    text-decoration: none; transition: all 0.3s ease;
+    background: var(--color-background); padding: 0.5rem 1rem;
+    border-radius: 8px; width: fit-content;
 }
-.contact-link:hover {
-    color: var(--color-text-primary);
-}
-.contact-link i {
-    font-size: 1.2rem;
-}
+.contact-link:hover { background-color: var(--color-primary); color: white; }
+.contact-link i { font-size: 1.2rem; }
+
 .info-footer {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #f0f0f0;
-    font-size: 0.85rem;
-    color: #9ca3af;
+    text-align: center; margin-top: 2rem; padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.85rem; color: var(--color-text-muted);
 }
 
-/* ... (CSS yang sudah ada sebelumnya) ... */
-
-/* =============== [BARU] Gaya untuk Tab di Modal =============== */
+/* =============== [BARU] Gaya untuk Tab di Modal (Responsive Tabs) =============== */
 .modal-tabs {
-    display: flex;
-    padding: 0 2rem;
-    border-bottom: 1px solid #eee;
-    margin-top: -1.5rem; /* Menarik tab ke atas */
+    display: flex; padding: 0 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+    margin-top: -1px; /* Tempel ke header */
+    overflow-x: auto; /* Scrollable tabs di mobile */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
 }
+.modal-tabs::-webkit-scrollbar { display: none; /* Hide scrollbar Chrome/Safari */ }
+
 .tab-btn {
-    padding: 0.8rem 1.2rem;
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
+    padding: 1rem 1.5rem; cursor: pointer; background: none; border: none;
+    font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 500;
+    color: var(--color-text-secondary); border-bottom: 3px solid transparent;
+    transition: all 0.3s ease; white-space: nowrap; /* Teks jangan patah */
 }
-.tab-btn:hover {
-    color: var(--color-text-dark);
-}
+.tab-btn:hover { color: var(--color-primary); background: rgba(0,0,0,0.02); }
 .tab-btn.active {
-    color: var(--color-primary);
-    font-weight: 600;
+    color: var(--color-primary); font-weight: 600;
     border-bottom: 3px solid var(--color-primary);
 }
-.tab-content.hidden {
-    display: none;
-}
+.tab-content.hidden { display: none; }
 
 /* =============== [BARU] Gaya untuk Konten Pengumuman =============== */
 .announcement-item {
-    padding-bottom: 1.2rem;
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 1.2rem; margin-bottom: 1.2rem;
+    border-bottom: 1px solid var(--color-border);
 }
-.announcement-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
+.announcement-item:last-child { border-bottom: none; margin-bottom: 0; }
+
 .announcement-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;
 }
 .announcement-header h5 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-text-dark);
+    font-size: 1rem; font-weight: 600; color: var(--color-text-primary);
 }
-.announcement-header h5 i {
-    margin-right: 0.6rem;
-    font-size: 1rem;
-    /* Memberi warna berbeda untuk setiap tipe ikon */
-}
-.announcement-header h5 i.fa-info-circle {
-    color: var(--color-primary); /* Biru */
-}
-.announcement-header h5 i.fa-triangle-exclamation {
-    color: #f59e0b; /* Kuning/Amber */
-}
-.announcement-header h5 i.fa-wrench {
-    color: #6366f1; /* Ungu/Indigo */
-}
+.announcement-header h5 i { margin-right: 0.6rem; font-size: 1rem; }
+.announcement-header h5 i.fa-info-circle { color: var(--color-primary); }
+.announcement-header h5 i.fa-triangle-exclamation { color: #f59e0b; }
+.announcement-header h5 i.fa-wrench { color: #6366f1; }
+
 .announcement-header .date {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
-    font-weight: 500;
+    font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 500;
+    background: var(--color-background); padding: 0.2rem 0.6rem; border-radius: 4px;
 }
 .announcement-item p {
-    font-size: 0.95rem;
-    color: var(--color-text-secondary);
-    line-height: 1.7;
+    font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.6;
 }
-.no-announcement {
-    text-align: center;
-    padding: 2rem 0;
-    color: #9ca3af;
-}
+.no-announcement { text-align: center; padding: 2rem 0; color: var(--color-text-muted); }
 
 /* =============== General Component: Buttons =============== */
-
 .detail-btn {
-    margin-top: auto;
-    background: var(--color-background);
-    color: var(--color-primary);
-    border: none;
-    padding: 0.75rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    font-family: 'Poppins', sans-serif;
-    transition: all 0.3s ease;
+    margin-top: auto; background: var(--color-background);
+    color: var(--color-primary); border: none; padding: 0.75rem;
+    border-radius: 8px; cursor: pointer; font-weight: 500;
+    font-family: 'Poppins', sans-serif; transition: all 0.3s ease;
+    width: 100%; /* [Bri Update] Full width di mobile */
 }
-
-.detail-btn:hover {
-    background: var(--color-primary);
-    color: white;
-}
+.detail-btn:hover { background: var(--color-primary); color: white; }
 
 .expand-btn {
-    width: 100%;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    padding: 0.8rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    transition: background 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    width: 100%; background: var(--color-primary); color: white;
+    border: none; padding: 0.8rem; border-radius: 8px;
+    cursor: pointer; font-weight: 500; font-size: 1rem;
+    transition: background 0.3s ease; display: flex;
+    align-items: center; justify-content: center; gap: 0.5rem;
 }
-
-.expand-btn:hover {
-    background: var(--color-text-primary);
-}
+.expand-btn:hover { background: var(--color-primary-dark); }
 
 .action-btn {
-    background: none;
-    border: 1px solid var(--color-primary);
-    color: var(--color-primary);
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 0.85rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    transition: all 0.3s ease;
+    background: transparent; border: 1px solid var(--color-primary);
+    color: var(--color-primary); padding: 0.4rem 0.8rem;
+    border-radius: 6px; cursor: pointer; font-family: 'Poppins', sans-serif;
+    font-weight: 500; font-size: 0.85rem; display: inline-flex;
+    align-items: center; gap: 0.4rem; transition: all 0.3s ease;
 }
-.action-btn:hover {
-    background-color: var(--color-primary);
-    color: white;
-}
+.action-btn:hover { background-color: var(--color-primary); color: white; }
 
 /* =============== General Component: Tags =============== */
 .tag {
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-transform: capitalize;
-    display: inline-block;
+    padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;
+    font-weight: 600; text-transform: uppercase; display: inline-block;
 }
 /* Jenis */
 .tag-kartu-perdana { background-color: #e0f2fe; color: #0ea5e9; }
 .tag-voucher { background-color: #e0e7ff; color: #6366f1; }
-/* [DITAMBAHKAN] Style untuk tag Dompul */
 .tag-dompul { background-color: #fefce8; color: #a16207; }
 
 /* Tipe */
 .tag-kosongan { background-color: #f1f5f9; color: #64748b; }
 .tag-paket { background-color: #dcfce7; color: #22c55e; }
-/* Provider */
-.tag-provider-xl { 
-    background-color: #dbeafe; /* Biru muda */
-    color: #2563eb; 
-}
-.tag-provider-axis { 
-    background-color: #ede9fe; /* Ungu muda */
-    color: #7c3aed; 
-}
-.tag-provider-smartfren { 
-    background-color: #fee2e2; /* Merah muda */
-    color: #dc2626; 
-}
 
+/* Provider */
+.tag-provider-xl { background-color: #dbeafe; color: #2563eb; }
+.tag-provider-axis { background-color: #ede9fe; color: #7c3aed; }
+.tag-provider-smartfren { background-color: #fee2e2; color: #dc2626; }
 
 /* =============== General Component: QR Code Modal Styles =============== */
 .qrcode-info-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    align-items: flex-start;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: flex-start;
 }
 .qrcode-display {
-    text-align: center;
-    background: var(--color-background);
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    text-align: center; background: var(--color-background);
+    padding: 1.5rem; border-radius: var(--border-radius);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .qrcode-display h4, .serial-number-list h4 {
-    font-weight: 600;
-    color: var(--color-text-dark);
-    margin-bottom: 1rem;
+    font-weight: 600; color: var(--color-text-primary); margin-bottom: 1rem;
 }
 .qrcode-display #qrcode {
-    max-width: 100%;
-    height: auto;
-    padding: 10px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    max-width: 100%; height: auto; padding: 10px;
+    background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 .qrcode-display p {
-    margin-top: 1rem;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    letter-spacing: 1px;
-    word-break: break-all;
+    margin-top: 1rem; font-weight: 500; color: var(--color-text-secondary);
+    letter-spacing: 1px; word-break: break-all; /* Mencegah kode panjang jebol */
+    background: white; padding: 0.5rem; border-radius: 4px; border: 1px solid var(--color-border);
 }
+
 .table-wrapper-modal {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 8px;
+    max-height: 300px; overflow-y: auto;
+    border: 1px solid var(--color-border); border-radius: 8px;
 }
-#serialNumberTable {
-    width: 100%;
-    border-collapse: collapse;
-}
-#serialNumberTable tr {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-#serialNumberTable tr:hover {
-    background-color: var(--color-background);
-}
-#serialNumberTable tr.active {
-    background-color: var(--color-primary);
-    color: white;
-    font-weight: 600;
-}
-#serialNumberTable td {
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 0.9rem;
-}
-#serialNumberTable tr:last-child td {
-    border-bottom: none;
-}
+#serialNumberTable { width: 100%; border-collapse: collapse; }
+#serialNumberTable tr { cursor: pointer; transition: background-color 0.2s ease; }
+#serialNumberTable tr:hover { background-color: var(--color-background); }
+#serialNumberTable tr.active { background-color: var(--color-primary); color: white; font-weight: 600; }
+#serialNumberTable td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--color-border); font-size: 0.9rem; }
+#serialNumberTable tr:last-child td { border-bottom: none; }
 
-/* =============== General Component: Tabel di dalam Modal =============== */
-.table-wrapper {
-    overflow-x: auto;
-}
+/* =============== General Component: Tabel di dalam Modal (UPDATED) =============== */
+/* [Bri Update] Scroll Wrapper Wajib */
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-.detail-modal-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-}
+.detail-modal-table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
 
-.detail-modal-table th,
-.detail-modal-table td {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #f0f0f0;
-    vertical-align: middle;
+.detail-modal-table th, .detail-modal-table td {
+    padding: 0.8rem 1rem; border-bottom: 1px solid var(--color-border); vertical-align: middle;
 }
-
 .detail-modal-table th {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
+    font-weight: 600; font-size: 0.85rem; color: var(--color-text-secondary);
+    background: var(--color-background);
 }
-
-.detail-modal-table td {
-    font-size: 0.95rem;
-    color: var(--color-text-dark);
-}
-
-.detail-modal-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
+.detail-modal-table td { font-size: 0.9rem; color: var(--color-text-primary); }
+.detail-modal-table tbody tr:last-child td { border-bottom: none; }
 
 /* =============== General Responsive Adjustments =============== */
 @media (max-width: 768px) {
+    /* Modal Full Mobile */
     .modal-content {
-        width: 95%;
-        padding: 0; /* Padding di-handle oleh header, body, footer */
-        margin: 1rem;
+        width: 100%; margin: 0; padding: 0;
+        border-radius: 0; height: 100%; max-height: 100vh;
     }
-    .modal-header, .modal-body, .modal-footer {
-        padding: 1.5rem;
-    }
-    .modal-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    /* QR Code Modal Mobile */
-    .qrcode-info-container { grid-template-columns: 1fr; }
-
-    /* =============== [BARU] Penyesuaian Font untuk Mobile =============== */
-
-    /* Mengatur ulang ukuran font dasar pada elemen root (HTML) */
-    html {
-        font-size: 14.5px; /* Anda bisa coba antara 14px hingga 15px */
-    }
-
-    /* Penyesuaian spesifik jika diperlukan (opsional) */
-    .detail-summary-card .card-info .value,
-    .dashboard-summary-card .card-info .value {
-        font-size: 1.8rem; /* Sedikit mengurangi ukuran angka besar di kartu ringkasan */
-    }
-
-    .summary-card .amount {
-        font-size: 1.9rem;
-    }
+    
+    .modal-header, .modal-body, .modal-footer { padding: 1rem; }
+    
+    /* QR Code Stack */
+    .qrcode-info-container { grid-template-columns: 1fr; gap: 1rem; }
+    
+    /* Font Size Adjustment */
+    html { font-size: 14.5px; }
+    
+    .summary-card .amount { font-size: 2rem; }
+    
+    /* Tombol jadi besar di mobile agar mudah ditekan */
+    .action-btn, .detail-btn { width: 100%; justify-content: center; margin-bottom: 0.5rem; }
 }
 
-
-@media (max-width: 480px) {
-    .modal-header, .modal-body, .modal-footer {
-        padding: 1rem;
-    }
-}
-
-/* =============== Loader =============== */
+/* =============== Loader (Tetap Dipertahankan) =============== */
 #loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(240, 247, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-    visibility: visible;
-    opacity: 1;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--color-background);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease;
+    visibility: visible; opacity: 1;
 }
 
-#loader-overlay.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
+#loader-overlay.hidden { opacity: 0; visibility: hidden; }
 
 .loader {
-    border: 8px solid #e0e0e0;
-    border-top: 8px solid var(--color-primary);
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1.2s linear infinite;
+    border: 6px solid var(--color-border);
+    border-top: 6px solid var(--color-primary);
+    border-radius: 50%; width: 50px; height: 50px;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

@@ -1,20 +1,45 @@
 /* =========================================
    STYLE KHUSUS HALAMAN STOCK OPNAME (SO)
-   File: so.css
+   File: so.css (REWRITTEN BY BRI - RESPONSIVE V2)
    ========================================= */
 
-/* 1. Filter Area */
+/* --- 0. GLOBAL FIXES & FLUID TYPOGRAPHY --- */
+/* Mencegah scroll horizontal pada body saat tabel melebar */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Membuat judul mengecil otomatis sesuai layar (Fluid) */
+.page-title {
+    font-size: clamp(1.2rem, 4vw, 1.8rem); /* Min 1.2rem, Ideal 4vw, Max 1.8rem */
+}
+
+h3 {
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
+}
+
+/* --- 1. FILTER AREA --- */
 .filter-section {
     display: flex;
+    flex-direction: column; /* Default HP: Susun ke bawah */
     gap: 1rem;
     margin-bottom: 1.5rem;
     background: var(--color-surface);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     border: 1px solid var(--color-border);
-    flex-wrap: wrap;
-    align-items: flex-end;
+    width: 100%;
+}
+
+/* Tampilan Desktop: Kembali ke baris (Row) */
+@media (min-width: 768px) {
+    .filter-section {
+        flex-direction: row;
+        align-items: flex-end;
+        padding: 1.5rem;
+    }
 }
 
 .filter-group {
@@ -22,7 +47,14 @@
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
-    min-width: 150px;
+    width: 100%; /* Penuhi lebar container di HP */
+}
+
+@media (min-width: 768px) {
+    .filter-group {
+        width: auto;
+        min-width: 150px;
+    }
 }
 
 .filter-group label {
@@ -31,6 +63,7 @@
     font-size: 0.85rem;
 }
 
+/* Input Styles */
 .custom-select, .custom-date {
     padding: 0.7rem;
     border-radius: 8px;
@@ -38,22 +71,157 @@
     background: var(--color-background);
     color: var(--color-text-primary);
     font-family: 'Poppins', sans-serif;
+    width: 100%; /* Agar full width di mobile */
 }
 
-/* 2. Tombol Floating (+) */
+/* Tombol Aksi (Terapkan) */
+.action-btn, .expand-btn {
+    width: 100%; /* Full width di HP agar mudah ditekan */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem;
+}
+
+@media (min-width: 768px) {
+    .action-btn, .expand-btn {
+        width: auto; /* Kembali auto di desktop */
+    }
+}
+
+/* --- 2. TABLE & DATA HANDLING (PENYELAMAT LAYOUT) --- */
+/* Wrapper ini memastikan hanya tabel yang scroll, bukan halamannya */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Scroll samping aktif otomatis */
+    -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Memaksa tabel tidak melipat teks (tetap satu baris rapi) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap; 
+}
+
+th, td {
+    padding: 12px 10px; /* Padding sedikit dikecilkan untuk mobile */
+    font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+}
+
+/* Override paksaan width dari HTML jika ada */
+th[style*="min-width"], td[style*="min-width"] {
+    min-width: auto !important;
+}
+
+#historyTableBody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#historyTableBody tr:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+/* --- 3. MODAL INPUT SO (LEMBAR KERJA) --- */
+/* Mobile First: Full Screen Experience */
+.modal-so-content {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    
+    /* Settingan Mobile Full */
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+}
+
+.modal-body-so {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem; /* Padding lebih aman untuk mobile */
+}
+
+/* Desktop Styles: Kembali ke Kotak Melayang */
+@media (min-width: 768px) {
+    .modal-so-content {
+        width: 95%;
+        max-width: 900px;
+        height: 90vh;
+        border-radius: 15px;
+        margin: auto;
+    }
+    
+    .modal-body-so {
+        padding: 1.5rem;
+    }
+}
+
+/* Input di dalam Tabel Modal */
+.input-product-select {
+    width: 140px; /* Lebar wajar di mobile */
+    padding: 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+}
+
+@media (min-width: 768px) {
+    .input-product-select {
+        width: 100%; /* Full width cell di desktop */
+    }
+}
+
+.input-stock-modal {
+    width: 60px; /* Dikecilkan agar muat di layar HP */
+    padding: 0.4rem;
+    border: 2px solid var(--color-border);
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+}
+.input-stock-modal:focus { border-color: var(--color-primary); outline: none; }
+
+.input-note-modal {
+    min-width: 120px; /* Agar input catatan tidak gepeng */
+    padding: 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+}
+
+/* Header Modal Responsive */
+.modal-header {
+    flex-wrap: wrap; /* Biar judul dan tanggal bisa turun ke bawah */
+    gap: 10px;
+}
+
+/* --- 4. FAB & INDICATORS --- */
 .fab-add {
     position: fixed;
-    bottom: 80px;
+    bottom: 80px; /* Di atas Bottom Nav */
     right: 20px;
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     background: var(--color-primary);
     color: white;
     border-radius: 50%;
     box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
     display: grid;
     place-items: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     cursor: pointer;
     z-index: 900;
     border: none;
@@ -64,115 +232,99 @@
     background: var(--color-primary-dark);
 }
 
-/* 3. Modal Input SO (Lembar Kerja) */
-.modal-so-content {
-    width: 95%;
-    max-width: 900px;
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
+@media (min-width: 768px) {
+    .fab-add {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+        bottom: 50px; /* Sedikit lebih rendah di desktop */
+    }
 }
 
-.modal-body-so {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.5rem;
-}
-
-/* Input di dalam Tabel Modal */
-.input-stock-modal {
-    width: 70px;
-    padding: 0.4rem;
-    border: 2px solid var(--color-border);
-    border-radius: 6px;
-    text-align: center;
-    font-weight: 600;
-    background: var(--color-background);
-    color: var(--color-text-primary);
-}
-.input-stock-modal:focus { border-color: var(--color-primary); outline: none; }
-
-.input-note-modal {
-    width: 100%;
-    padding: 0.4rem;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    background: var(--color-background);
-    color: var(--color-text-primary);
-    font-size: 0.85rem;
-}
-
-/* 4. Indikator Selisih & Tabel */
 .variance-good { color: #22c55e; font-weight: bold; }
 .variance-bad { color: #ef4444; font-weight: bold; }
 
-/* Agar baris tabel riwayat terasa bisa diklik */
-#historyTableBody tr {
+/* Tombol Hapus Baris (X) */
+.btn-remove-row {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin: 0 auto;
+}
+.btn-remove-row:hover {
+    background: #ef4444;
+    color: white;
+    transform: scale(1.1) rotate(90deg);
 }
 
-#historyTableBody tr:hover {
-    background-color: rgba(74, 144, 226, 0.1);
-}
-
-/* 5. Tombol Aksi di Modal Detail */
+/* --- 5. MODAL ACTIONS (Detail View) --- */
 .modal-actions {
     display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
+    flex-direction: column-reverse; /* Tombol hapus di bawah pada HP */
+    gap: 1rem;
+    margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+    .modal-actions {
+        flex-direction: row; /* Jejer ke samping pada Desktop */
+        justify-content: space-between;
+    }
 }
 
 .btn-delete {
     background-color: #fee2e2;
     color: #dc2626;
     border: 1px solid #fecaca;
-    padding: 0.6rem 1.2rem;
+    padding: 0.8rem;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
-    transition: all 0.3s;
+    text-align: center;
+    width: 100%;
 }
+@media (min-width: 768px) { .btn-delete { width: auto; padding: 0.6rem 1.2rem; } }
+
 .btn-delete:hover {
     background-color: #dc2626;
     color: white;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .fab-add { bottom: 90px; right: 15px; width: 55px; height: 55px; }
-    .filter-section { padding: 1rem; }
-}
-
-/* =========================================
-   CUSTOM ALERT STYLES (Tambahan di so.css)
-   ========================================= */
-
+/* --- 6. CUSTOM ALERT STYLES --- */
 .alert-icon-wrapper {
     width: 70px;
     height: 70px;
     background: var(--color-background);
     border-radius: 50%;
-    margin: -35px auto 1rem auto; /* Efek menyembul keluar sedikit ke atas */
+    margin: -35px auto 1rem auto;
     display: grid;
     place-items: center;
     font-size: 2rem;
     color: var(--color-primary);
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     position: relative;
-    border: 4px solid var(--color-surface); /* Border putih tebal agar terpisah dari kartu */
+    border: 4px solid var(--color-surface);
 }
 
-/* Warna Icon Berdasarkan Tipe */
 .alert-icon-wrapper.success { color: #22c55e; background: #dcfce7; }
 .alert-icon-wrapper.error { color: #ef4444; background: #fee2e2; }
 .alert-icon-wrapper.warning { color: #f59e0b; background: #fef3c7; }
 
-/* Animasi Masuk Modal Alert */
 #customAlertModal.show .modal-content {
     animation: bounceIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 90%; /* Responsive Alert width */
+    max-width: 400px;
 }
 
 @keyframes bounceIn {
@@ -180,51 +332,6 @@
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* Tombol Alert */
 .alert-actions button {
     min-width: 100px;
 }
-
-/* TAMBAHAN UPDATE DROPDOWN & TOMBOL */
-
-/* Select Produk di dalam tabel */
-.input-product-select {
-    width: 100%;
-    padding: 0.4rem;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    background: var(--color-background);
-    color: var(--color-text-primary);
-    font-size: 0.9rem;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-}
-
-.input-product-select:focus {
-    border-color: var(--color-primary);
-    outline: none;
-}
-
-/* Tombol Hapus Baris (X) */
-.btn-remove-row {
-background: #fee2e2; /* Latar Merah Muda */
-    border: 1px solid #fecaca;
-    color: #ef4444; /* Ikon Merah */
-    width: 30px;
-    height: 30px;
-    border-radius: 50%; /* Jadi Bulat */
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    margin: 0 auto; /* Tengah */
-}
-.btn-remove-row:hover {
-    background: #ef4444;
-    color: white;
-    transform: scale(1.1) rotate(90deg); /* Efek putar sedikit biar keren */
-    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
-}
-
